@@ -21,8 +21,20 @@ public final class NotificationService {
     public NotificationService(List<Notifier> channels, Priority threshold) {
         // TODO(4.1): validate — channels ห้าม null/มีสมาชิก null,
         //            threshold ห้าม null → throw IllegalArgumentException
+        if(channels == null || channels.isEmpty()) 
+            throw new IllegalArgumentException();
+        for (Notifier notifier : channels) {
+            if(notifier == null)
+                throw new IllegalArgumentException();
+            
+        }
+        if(threshold == null)
+            throw new IllegalArgumentException();
+
+
         // TODO(4.2): ✗ เก็บลูกศรตรง ๆ เสี่ยง aliasing → defensive copy!
-        this.channels = channels;
+
+        this.channels = List.copyOf(channels);
         this.threshold = threshold;
     }
 
@@ -41,8 +53,16 @@ public final class NotificationService {
      */
     public boolean broadcast(String message, Priority priority) {
         // TODO(4.3): validate message (null/ว่าง) และ priority (null)
+        if(message == null || message.isEmpty())
+            throw new IllegalArgumentException();
+        if(priority == null) 
+            throw new IllegalArgumentException();
         // TODO(4.4): ถ้า priority ต่ำกว่า threshold ให้ "ไม่ส่ง" และคืน false
         //            คำใบ้: ใช้ Priority.isAtLeast(...) ที่คุณเพิ่งเขียน
+       if(!priority.isAtLeast(threshold)){
+        return false ;
+       }
+
         for (Notifier n : channels) {
             n.send(message);    // polymorphism — ไม่สน concrete type เลย (OCP)
         }
